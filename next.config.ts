@@ -3,12 +3,12 @@ import type { NextConfig } from 'next'
 const isDevelopment = process.env.NODE_ENV === 'development'
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ''} https://challenges.cloudflare.com`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' blob: data: https://images.unsplash.com https://*.supabase.co https://lh3.googleusercontent.com",
-  "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com",
-  "frame-src https://challenges.cloudflare.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com blob:",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "img-src 'self' blob: data: https://images.unsplash.com https://*.supabase.co https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "connect-src 'self' data: blob: https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com https://*.googleapis.com https://*.google.com https://*.gstatic.com",
+  "frame-src https://challenges.cloudflare.com https://*.google.com",
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",

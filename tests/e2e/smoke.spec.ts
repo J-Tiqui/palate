@@ -43,8 +43,12 @@ test('new accounts require the temporary early access password', async ({ page }
   await expect(page.getByText('That early access password is incorrect.', { exact: true })).toBeVisible()
 })
 
-test('map renders sample places and working search and price filters', async ({ page, isMobile }) => {
+test('map renders an interactive map with working search and price filters', async ({ page, isMobile }) => {
   await page.goto('/map')
+  await expect(page.getByTestId('google-map')).toBeVisible()
+  await expect(page.locator('.google-map-shell')).toHaveAttribute('data-map-status', 'ready', { timeout: 15_000 })
+  await expect(page.locator('.google-map-shell')).toHaveAttribute('data-marker-count', '8')
+  await expect(page.getByRole('button', { name: 'Centre map on my location' })).toBeVisible()
   if (isMobile) {
     await expect(page.getByText('Map preview.')).toBeVisible()
   } else {
@@ -52,8 +56,10 @@ test('map renders sample places and working search and price filters', async ({ 
     await expect(page.getByText('places in this view')).toBeVisible()
   }
   await page.getByLabel('Search Toronto restaurants').fill('Japanese')
+  await expect(page.locator('.google-map-shell')).toHaveAttribute('data-marker-count', '1')
   await expect(page.getByRole('heading', { name: 'Miku Toronto' })).toBeVisible()
   await page.getByLabel('Max price').selectOption('2')
+  await expect(page.locator('.google-map-shell')).toHaveAttribute('data-marker-count', '0')
   await expect(page.getByRole('heading', { name: 'Miku Toronto' })).toHaveCount(0)
 })
 

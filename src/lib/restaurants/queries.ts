@@ -5,7 +5,7 @@ import type { Database, RestaurantRow } from '@/types/database'
 
 export type RestaurantCardData = Pick<
   RestaurantRow,
-  'id' | 'slug' | 'name' | 'neighbourhood' | 'city' | 'price_level' | 'average_rating' | 'review_count' | 'hero_image_url' | 'provider'
+  'id' | 'slug' | 'name' | 'neighbourhood' | 'city' | 'price_level' | 'average_rating' | 'review_count' | 'hero_image_url' | 'provider' | 'latitude' | 'longitude'
 > & {
   cuisines: string[]
   vibes: string[]
@@ -23,7 +23,7 @@ export async function getRestaurantCards(
 ): Promise<{ restaurants: RestaurantCardData[]; error: string | null }> {
   let query = supabase
     .from('restaurants')
-    .select('id, slug, name, neighbourhood, city, price_level, average_rating, review_count, hero_image_url, provider')
+    .select('id, slug, name, neighbourhood, city, price_level, average_rating, review_count, hero_image_url, provider, latitude, longitude')
     .order('average_rating', { ascending: false })
     .order('name', { ascending: true })
     .limit(Math.min(Math.max(limit, 1), 50))
@@ -87,7 +87,7 @@ export async function getRestaurantCardsByIds(
   if (!restaurantIds.length) return []
   const { data } = await supabase
     .from('restaurants')
-    .select('id, slug, name, neighbourhood, city, price_level, average_rating, review_count, hero_image_url, provider')
+    .select('id, slug, name, neighbourhood, city, price_level, average_rating, review_count, hero_image_url, provider, latitude, longitude')
     .in('id', restaurantIds.slice(0, 100))
 
   if (!data) return []

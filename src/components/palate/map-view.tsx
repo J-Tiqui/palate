@@ -3,7 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Filter, Search, Star } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { GoogleMapCanvas } from '@/components/palate/google-map-canvas'
 import { DEMO_NOTICE, demoRestaurants, type PalateRestaurant } from '@/lib/palate/demo-data'
 
 const filters = ['All', 'Saved', 'Michelin', 'Date night'] as const
@@ -13,10 +14,11 @@ type MapViewProps = {
   restaurants: PalateRestaurant[]
   savedIds: string[]
   isDemo: boolean
+  mapApiKey: string
   error?: string | null
 }
 
-export function MapView({ restaurants, savedIds, isDemo, error }: MapViewProps) {
+export function MapView({ restaurants, savedIds, isDemo, mapApiKey, error }: MapViewProps) {
   const catalogue = restaurants.length ? restaurants : demoRestaurants
   const isSampleMap = isDemo || restaurants.length === 0
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]>('All')
@@ -24,6 +26,7 @@ export function MapView({ restaurants, savedIds, isDemo, error }: MapViewProps) 
   const [priceMin, setPriceMin] = useState(1)
   const [priceMax, setPriceMax] = useState(4)
   const [selectedId, setSelectedId] = useState(catalogue[2]?.id ?? catalogue[0]?.id)
+  const selectRestaurant = useCallback((restaurantId: string) => setSelectedId(restaurantId), [])
   const savedIdSet = useMemo(() => new Set(savedIds), [savedIds])
   const visible = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -111,7 +114,7 @@ export function MapView({ restaurants, savedIds, isDemo, error }: MapViewProps) 
             <em>{isSampleMap ? 'DEMO' : 'LIVE'}</em>
           </div>
           {visible.map((restaurant) => (
-            <button type="button" key={restaurant.id} className={selected?.id === restaurant.id ? 'active' : ''} onClick={() => setSelectedId(restaurant.id)}>
+            <button type="button" key={restaurant.id} className={selected?.id === restaurant.id ? 'active' : ''} onClick={() => selectRestaurant(restaurant.id)}>
               <Image src={restaurant.image} alt="" width={140} height={130} />
               <div><strong>{restaurant.name}</strong><span>{restaurant.cuisine}</span><small><Star aria-hidden="true" size={10} fill="currentColor" /> {restaurant.rating.toFixed(1)} · {restaurant.distance}</small></div>
             </button>
@@ -120,19 +123,12 @@ export function MapView({ restaurants, savedIds, isDemo, error }: MapViewProps) 
         </aside>
 
         <section className="custom-map" aria-label="Map of Toronto restaurants">
-          <div className="map-grid" aria-hidden="true" />
-          <span className="neighbourhood-label n1">LITTLE ITALY</span>
-          <span className="neighbourhood-label n2">DOWNTOWN</span>
-          <span className="neighbourhood-label n3">HARBOURFRONT</span>
-          <span className="road-label r1">Spadina Ave.</span>
-          <span className="road-label r2">College St.</span>
-          <span className="water-label">LAKE ONTARIO</span>
-          {visible.slice(0, 7).map((restaurant, index) => (
-            <button type="button" key={restaurant.id} className={`restaurant-marker marker-${index + 1} ${restaurant.id === selected?.id ? 'active' : ''} ${restaurant.recognition ? 'guide' : ''}`} onClick={() => setSelectedId(restaurant.id)} aria-label={`Select ${restaurant.name}`}>
-              <span>{restaurant.rating.toFixed(1)}</span>
-            </button>
-          ))}
-          <span className="user-location"><i />You</span>
+          <GoogleMapCanvas
+            apiKey={mapApiKey}
+            restaurants={visible}
+            selectedId={selected?.id}
+            onSelect={selectRestaurant}
+          />
 
           {selected ? (
             <article className="map-preview">
@@ -151,7 +147,6 @@ export function MapView({ restaurants, savedIds, isDemo, error }: MapViewProps) 
               <span>Clear a filter or widen the price range.</span>
             </div>
           )}
-          <div className="map-legend"><span><i className="legend-high" />4.5+ great</span><span><i className="legend-mid" />4.0+ good</span><span><i className="legend-low" />Under 4.0</span></div>
         </section>
       </div>
     </div>

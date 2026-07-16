@@ -260,6 +260,83 @@ a {
   font-size: 10px;
 }
 
+.google-map-shell,
+.google-map-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.google-map-shell {
+  background: #e9e3d8;
+}
+
+.google-map-canvas {
+  min-height: 360px;
+}
+
+.map-loading,
+.map-service-error {
+  z-index: 4;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  padding: 18px 22px;
+  box-shadow: var(--soft-shadow);
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.map-service-error {
+  display: flex;
+  width: min(330px, calc(100% - 28px));
+  flex-direction: column;
+  gap: 5px;
+  text-align: center;
+}
+
+.map-service-error strong {
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.map-location-control {
+  z-index: 5;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #d7d1c8;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 12px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
+  color: #302b27;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.map-location-control:hover {
+  background: #f7f4ee;
+}
+
+.sr-map-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
 /* Next.js links replace the prototype's in-memory navigation buttons. */
 .side-nav nav a {
   min-height: 46px;

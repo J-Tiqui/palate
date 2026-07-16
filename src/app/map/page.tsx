@@ -10,6 +10,7 @@ export default async function MapPage() {
         restaurants={restaurants}
         savedIds={[...savedIds]}
         isDemo={isDemo}
+        mapApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''}
         error={error}
       />
     </PalateShell>

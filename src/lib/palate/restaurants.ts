@@ -38,6 +38,8 @@ function toPalateRestaurant(restaurant: RestaurantCardData): PalateRestaurant {
     distance: 'Toronto',
     friends: [],
     source: restaurant.provider === 'seed' ? 'seeded' : 'database',
+    latitude: restaurant.latitude ?? undefined,
+    longitude: restaurant.longitude ?? undefined,
   }
 }
 
