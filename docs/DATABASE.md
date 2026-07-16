@@ -1,13 +1,13 @@
 # Database, storage, and authorization
 
-The initial migration is `supabase/migrations/20260716121548_initial_backend_foundation.sql`. It is the source of truth; `src/types/database.ts` mirrors it for application code.
+Checked-in files under `supabase/migrations` are the schema source of truth; `src/types/database.ts` mirrors the resulting schema for application code.
 
 ## Model
 
 - `profiles` is one-to-one with `auth.users`; a security-definer trigger creates safe defaults from trusted auth metadata.
 - `restaurants` owns `restaurant_photos` and normalized many-to-many `restaurant_cuisines`/`cuisine_categories` and `restaurant_vibes`/`vibe_tags`.
 - `reviews` owns `review_companions`; `visits` records logs; `saved_restaurants` prevents duplicate user/restaurant saves.
-- `user_taste_preferences` stores onboarding and recommendation inputs per user.
+- `user_taste_preferences` stores safety-sensitive onboarding and recommendation inputs per user. Price is intentionally a per-search map/Blend constraint, not an account preference.
 - `lists` owns ordered `list_items`; `list_collaborators` grants explicit editor/viewer membership.
 - `goals` owns `goal_progress`.
 - `follows` models directed requests/relationships.
@@ -31,6 +31,8 @@ RLS is enabled on every exposed table. Policies provide:
 - owner-only recommendation explanation reads and trusted-server writes.
 
 Helper functions live in a non-exposed `private` schema, use fixed empty `search_path` values, and have narrowly granted execute permissions. Column-level grants prevent ownership fields from being reassigned even when a row update is allowed. Server Actions still authenticate and validate before reaching RLS; both layers are intentional.
+
+The public `complete_onboarding` function is a narrowly granted, security-invoker transaction. It verifies `auth.uid()`, saves the user's profile and taste constraints together, and remains subject to the same grants and RLS policies as direct writes.
 
 ## Storage
 

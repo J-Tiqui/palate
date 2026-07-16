@@ -30,11 +30,10 @@ export async function completeOnboardingAction(
     displayName: formData.get('displayName'),
     homeCity: formData.get('homeCity'),
     favouriteCuisines: formData.get('favouriteCuisines'),
+    dislikedCuisines: formData.get('dislikedCuisines'),
     preferredVibes: formData.get('preferredVibes'),
     dietaryRestrictions: formData.get('dietaryRestrictions'),
     allergies: formData.get('allergies'),
-    priceMin: formData.get('priceMin'),
-    priceMax: formData.get('priceMax'),
   })
 
   if (!parsed.success) {
@@ -44,35 +43,60 @@ export async function completeOnboardingAction(
   const user = await requireUser('/onboarding')
   const supabase = await createClient()
 
-  const { error: tasteError } = await supabase
-    .from('user_taste_preferences')
-    .upsert({
-      user_id: user.id,
+  const onboardingArgs = {
+    p_user_id: user.id,
+    p_username: parsed.data.username,
+    p_display_name: parsed.data.displayName,
+    p_home_city: parsed.data.homeCity,
+    p_favourite_cuisines: parsed.data.favouriteCuisines,
+    p_disliked_cuisines: parsed.data.dislikedCuisines,
+    p_preferred_vibes: parsed.data.preferredVibes,
+    p_dietary_restrictions: parsed.data.dietaryRestrictions,
+    p_allergies: parsed.data.allergies,
+  }
+  let { error: profileError } = await supabase.rpc('complete_onboarding', onboardingArgs)
+
+  // Keep the release compatible while the checked-in migration is rolled out
+  // separately. Existing projects already create this row in the auth trigger.
+  if (profileError && ['PGRST202', '42883'].includes(profileError.code ?? '')) {
+    const tasteValues = {
       dietary_restrictions: parsed.data.dietaryRestrictions,
       allergies: parsed.data.allergies,
-      price_min: parsed.data.priceMin,
-      price_max: parsed.data.priceMax,
-    }, { onConflict: 'user_id' })
+    }
+    const { data: taste, error: tasteError } = await supabase
+      .from('user_taste_preferences')
+      .update(tasteValues)
+      .eq('user_id', user.id)
+      .select('user_id')
+      .maybeSingle()
 
-  if (tasteError) {
-    return { status: 'error', message: 'We could not save your taste preferences. Please try again.' }
+    if (tasteError) {
+      return { status: 'error', message: 'We could not save your taste preferences. Please try again.' }
+    }
+
+    if (!taste) {
+      const { error: insertTasteError } = await supabase
+        .from('user_taste_preferences')
+        .insert({ user_id: user.id, ...tasteValues })
+      if (insertTasteError) {
+        return { status: 'error', message: 'We could not save your taste preferences. Please try again.' }
+      }
+    }
+
+    const legacyProfileResult = await supabase
+      .from('profiles')
+      .update({
+        username: parsed.data.username,
+        display_name: parsed.data.displayName,
+        home_city: parsed.data.homeCity,
+        favourite_cuisines: parsed.data.favouriteCuisines,
+        disliked_cuisines: parsed.data.dislikedCuisines,
+        preferred_vibes: parsed.data.preferredVibes,
+        onboarding_completed: true,
+      })
+      .eq('id', user.id)
+    profileError = legacyProfileResult.error
   }
-
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .update({
-      username: parsed.data.username,
-      display_name: parsed.data.displayName,
-      home_city: parsed.data.homeCity,
-      favourite_cuisines: parsed.data.favouriteCuisines,
-      preferred_vibes: parsed.data.preferredVibes,
-      price_preference: Array.from(
-        { length: parsed.data.priceMax - parsed.data.priceMin + 1 },
-        (_, index) => parsed.data.priceMin + index,
-      ),
-      onboarding_completed: true,
-    })
-    .eq('id', user.id)
 
   if (profileError?.code === '23505') {
     return { status: 'error', message: 'That username is already taken. Try another one.' }
@@ -291,7 +315,6 @@ export async function updateProfileAction(
     favouriteCuisines: formData.get('favouriteCuisines'),
     dislikedCuisines: formData.get('dislikedCuisines'),
     preferredVibes: formData.get('preferredVibes'),
-    pricePreference: formData.get('pricePreference'),
     privacy: formData.get('privacy'),
   })
   if (!parsed.success) return { status: 'error', message: firstValidationMessage(parsed.error) }
@@ -307,7 +330,6 @@ export async function updateProfileAction(
     favourite_cuisines: parsed.data.favouriteCuisines,
     disliked_cuisines: parsed.data.dislikedCuisines,
     preferred_vibes: parsed.data.preferredVibes,
-    price_preference: parsed.data.pricePreference,
     privacy: parsed.data.privacy,
   }).eq('id', user.id)
 

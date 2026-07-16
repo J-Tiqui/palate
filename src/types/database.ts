@@ -1,4 +1,4 @@
-// Kept in sync with supabase/migrations/20260716121548_initial_backend_foundation.sql.
+// Kept in sync with the applied files under supabase/migrations.
 // Regenerate after applying migrations with:
 //   supabase gen types typescript --local > src/types/database.generated.ts
 
@@ -31,7 +31,6 @@ export type ProfileRow = {
   favourite_cuisines: string[]
   disliked_cuisines: string[]
   preferred_vibes: string[]
-  price_preference: number[]
   privacy: ProfileVisibility
   onboarding_completed: boolean
   created_at: string
@@ -153,8 +152,6 @@ export type UserTastePreferenceRow = {
   dietary_restrictions: string[]
   allergies: string[]
   excluded_ingredients: string[]
-  price_min: number
-  price_max: number
   max_distance_km: number | null
   created_at: string
   updated_at: string
@@ -319,6 +316,20 @@ export type Database = {
     }
     Views: Record<never, never>
     Functions: {
+      complete_onboarding: {
+        Args: {
+          p_user_id: string
+          p_username: string
+          p_display_name: string
+          p_home_city: string
+          p_favourite_cuisines: string[]
+          p_disliked_cuisines: string[]
+          p_preferred_vibes: string[]
+          p_dietary_restrictions: string[]
+          p_allergies: string[]
+        }
+        Returns: undefined
+      }
       log_restaurant_visit: {
         Args: {
           p_restaurant_id: string

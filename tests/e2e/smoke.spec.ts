@@ -23,6 +23,20 @@ test('login and signup forms expose accessible controls', async ({ page }) => {
   await expect(page.getByLabel('Confirm password')).toBeVisible()
 })
 
+test('map renders sample places and working search and price filters', async ({ page, isMobile }) => {
+  await page.goto('/map')
+  if (isMobile) {
+    await expect(page.getByText('Map preview.')).toBeVisible()
+  } else {
+    await expect(page.getByRole('heading', { name: 'Toronto map' })).toBeVisible()
+    await expect(page.getByText('places in this view')).toBeVisible()
+  }
+  await page.getByLabel('Search Toronto restaurants').fill('Japanese')
+  await expect(page.getByRole('heading', { name: 'Miku Toronto' })).toBeVisible()
+  await page.getByLabel('Max price').selectOption('2')
+  await expect(page.getByRole('heading', { name: 'Miku Toronto' })).toHaveCount(0)
+})
+
 test('password recovery and an invalid OAuth callback fail safely', async ({ page }) => {
   await page.goto('/forgot-password')
   await expect(page.getByRole('heading', { name: 'Reset your password' })).toBeVisible()

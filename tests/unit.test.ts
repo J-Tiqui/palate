@@ -11,6 +11,7 @@ import { getSafeRedirectPath } from '../src/lib/security/redirects.ts'
 import {
   forgotPasswordSchema,
   loginSchema,
+  onboardingSchema,
   oauthProviderSchema,
   resetPasswordSchema,
   reviewSchema,
@@ -100,6 +101,26 @@ test('username normalization, format, and reserved-name checks are enforced', ()
   if (valid.success) assert.equal(valid.data, 'jules_eats')
   assert.equal(usernameSchema.safeParse('admin').success, false)
   assert.equal(usernameSchema.safeParse('_starts_wrong').success, false)
+})
+
+test('onboarding accepts multi-select preferences without an account price range', () => {
+  const result = onboardingSchema.safeParse({
+    username: 'jules_eats',
+    displayName: 'Jules',
+    homeCity: 'Toronto',
+    favouriteCuisines: 'Japanese,Thai',
+    dislikedCuisines: 'French',
+    preferredVibes: 'Date night,Cozy',
+    dietaryRestrictions: 'Vegetarian',
+    allergies: 'Peanuts,Shellfish',
+  })
+
+  assert.equal(result.success, true)
+  if (result.success) {
+    assert.deepEqual(result.data.favouriteCuisines, ['Japanese', 'Thai'])
+    assert.deepEqual(result.data.dislikedCuisines, ['French'])
+    assert.equal('priceMin' in result.data, false)
+  }
 })
 
 test('review validation enforces rating bounds and half-star increments', () => {

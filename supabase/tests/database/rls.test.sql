@@ -1,7 +1,32 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select plan(29);
+select plan(36);
+
+select has_function(
+  'public',
+  'complete_onboarding',
+  array['uuid', 'text', 'text', 'text', 'text[]', 'text[]', 'text[]', 'text[]', 'text[]'],
+  'atomic onboarding function exists'
+);
+
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.complete_onboarding(uuid,text,text,text,text[],text[],text[],text[],text[])',
+    'EXECUTE'
+  ),
+  'authenticated users can execute atomic onboarding'
+);
+
+select ok(
+  not has_function_privilege(
+    'anon',
+    'public.complete_onboarding(uuid,text,text,text,text[],text[],text[],text[],text[])',
+    'EXECUTE'
+  ),
+  'anonymous users cannot execute atomic onboarding'
+);
 
 select has_function(
   'public',
@@ -108,6 +133,48 @@ select results_eq(
   $$update public.profiles set display_name = 'Alice Updated' where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' returning id$$,
   array['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa']::uuid[],
   'a user can update their own profile'
+);
+
+select lives_ok(
+  $$select public.complete_onboarding(
+    'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    'alice_eats',
+    'Alice Eats',
+    'Toronto',
+    array['Japanese', 'Thai']::text[],
+    array['French']::text[],
+    array['Date night']::text[],
+    array['Vegetarian']::text[],
+    array['Peanuts']::text[]
+  )$$,
+  'a user can atomically complete their own onboarding'
+);
+
+select is(
+  (select onboarding_completed from public.profiles where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'),
+  true,
+  'atomic onboarding marks the profile complete'
+);
+
+select is(
+  (select allergies from public.user_taste_preferences where user_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'),
+  array['Peanuts']::text[],
+  'atomic onboarding saves private allergy constraints'
+);
+
+select throws_ok(
+  $$select public.complete_onboarding(
+    'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    'bob_eats',
+    'Bob Eats',
+    'Toronto',
+    '{}'::text[],
+    '{}'::text[],
+    '{}'::text[],
+    '{}'::text[],
+    '{}'::text[]
+  )$$,
+  'a user cannot complete onboarding for another user'
 );
 
 select lives_ok(

@@ -82,14 +82,10 @@ export const onboardingSchema = z.object({
   displayName: z.string().trim().min(1).max(80),
   homeCity: z.string().trim().min(1).max(120),
   favouriteCuisines: csvArray(25),
+  dislikedCuisines: csvArray(25),
   preferredVibes: csvArray(25),
   dietaryRestrictions: csvArray(30),
   allergies: csvArray(30),
-  priceMin: z.coerce.number().int().min(1).max(4),
-  priceMax: z.coerce.number().int().min(1).max(4),
-}).refine((values) => values.priceMin <= values.priceMax, {
-  message: 'Minimum price cannot be higher than maximum price.',
-  path: ['priceMax'],
 })
 
 export const profileUpdateSchema = z.object({
@@ -101,9 +97,6 @@ export const profileUpdateSchema = z.object({
   favouriteCuisines: csvArray(25),
   dislikedCuisines: csvArray(25),
   preferredVibes: csvArray(25),
-  pricePreference: csvArray(4, 1).transform((values) => values.map(Number)).pipe(
-    z.array(z.number().int().min(1).max(4)).max(4),
-  ),
   privacy: z.enum(['public', 'followers', 'private']),
 })
 

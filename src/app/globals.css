@@ -34,6 +34,232 @@ a {
   border: 0;
 }
 
+.palate-submit {
+  width: 100%;
+  border-radius: 1rem;
+  background: #6b2637;
+  color: #fffaf3;
+  padding: 0.875rem 1.25rem;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgb(107 38 55 / 18%);
+  transition: background 0.18s, transform 0.18s;
+}
+
+.palate-submit:hover {
+  background: #4f1b29;
+  transform: translateY(-1px);
+}
+
+.palate-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.preference-select {
+  min-width: 0;
+  color: var(--ink, #201c18);
+}
+
+.preference-select legend {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.preference-select details {
+  position: relative;
+}
+
+.preference-select summary {
+  min-height: 3rem;
+  cursor: pointer;
+  list-style: none;
+  border: 1px solid rgb(0 0 0 / 10%);
+  border-radius: 1rem;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+.preference-select summary::-webkit-details-marker {
+  display: none;
+}
+
+.preference-select summary .placeholder {
+  color: rgb(0 0 0 / 42%);
+}
+
+.preference-select details[open] summary {
+  border-color: #6b2637;
+  box-shadow: 0 0 0 3px rgb(107 38 55 / 12%);
+}
+
+.preference-select details[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.preference-select-menu {
+  z-index: 50;
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  right: 0;
+  max-height: 15rem;
+  overflow-y: auto;
+  border: 1px solid var(--line, #ddd5c8);
+  border-radius: 1rem;
+  background: var(--surface, #fffdf8);
+  padding: 0.45rem;
+  box-shadow: 0 18px 45px rgb(35 25 18 / 18%);
+}
+
+.preference-select-menu label {
+  cursor: pointer;
+  border-radius: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.7rem;
+  font-size: 0.825rem;
+}
+
+.preference-select-menu label:hover {
+  background: var(--surface-2, #eee8dc);
+}
+
+.preference-select-menu input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.preference-check {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: none;
+  border: 1px solid var(--line, #ddd5c8);
+  border-radius: 0.35rem;
+  color: #fffaf3;
+  display: grid;
+  place-items: center;
+}
+
+.preference-select-menu input:checked + .preference-check {
+  border-color: #6b2637;
+  background: #6b2637;
+}
+
+.preference-select-menu input:focus-visible + .preference-check {
+  outline: 3px solid rgb(107 38 55 / 24%);
+  outline-offset: 2px;
+}
+
+.preference-select > small {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--muted, #756e65);
+  font-size: 0.75rem;
+}
+
+.form-scroll .preference-select {
+  margin-top: 15px;
+}
+
+.form-scroll .preference-select summary {
+  border-color: var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.map-notice,
+.map-error {
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 9px 22px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.map-notice strong {
+  color: var(--ink);
+}
+
+.map-error {
+  background: #f8e5e5;
+  color: #6b2637;
+}
+
+.map-price-filter {
+  border-left: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-left: 10px;
+}
+
+.map-price-filter label {
+  position: relative;
+}
+
+.map-price-filter label > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.map-price-filter select {
+  min-height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 0 25px 0 9px;
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.map-price-filter > span {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.map-empty {
+  margin: 18px 14px !important;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 18px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.map-empty-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 22px 28px;
+  box-shadow: var(--soft-shadow);
+}
+
+.map-empty-overlay span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
 /* Next.js links replace the prototype's in-memory navigation buttons. */
 .side-nav nav a {
   min-height: 46px;
@@ -256,5 +482,10 @@ a {
   .route-detail,
   .route-form {
     padding: 0;
+  }
+
+  .map-price-filter {
+    border-left: 0;
+    padding-left: 0;
   }
 }
