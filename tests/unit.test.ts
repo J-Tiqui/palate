@@ -10,6 +10,7 @@ import {
   type BlendMemberPreferences,
 } from '../src/lib/blend/scoring.ts'
 import { getSafeRedirectPath } from '../src/lib/security/redirects.ts'
+import { googlePlaceSchema, googlePlacesResponseSchema, mapGooglePlace } from '../src/lib/restaurants/google-places-data.ts'
 import {
   forgotPasswordSchema,
   loginSchema,
@@ -196,4 +197,43 @@ test('Blend ranking is deterministic when scores tie', () => {
     { ...candidate, restaurantId: 'restaurant-a' },
   ], members)
   assert.deepEqual(rankings.map((result) => result.restaurantId), ['restaurant-a', 'restaurant-b'])
+})
+
+test('Google Places data is mapped without conflating provider and Palate fields', () => {
+  const parsed = googlePlaceSchema.parse({
+    id: 'ChIJ-palate-test',
+    displayName: { text: 'Test Kitchen' },
+    formattedAddress: '1 Front Street, Toronto, ON',
+    addressComponents: [
+      { longText: 'Toronto', shortText: 'Toronto', types: ['locality'] },
+      { longText: 'Ontario', shortText: 'ON', types: ['administrative_area_level_1'] },
+      { longText: 'Canada', shortText: 'CA', types: ['country'] },
+    ],
+    location: { latitude: 43.64, longitude: -79.38 },
+    primaryType: 'italian_restaurant',
+    primaryTypeDisplayName: { text: 'Italian restaurant' },
+    priceLevel: 'PRICE_LEVEL_EXPENSIVE',
+    rating: 4.6,
+    userRatingCount: 321,
+    businessStatus: 'OPERATIONAL',
+    googleMapsUri: 'https://maps.google.com/?cid=123',
+    regularOpeningHours: { openNow: true, weekdayDescriptions: ['Monday: 5:00–10:00 PM'] },
+    photos: [{ name: 'places/ChIJ-palate-test/photos/photo-1', authorAttributions: [{ displayName: 'A Diner' }] }],
+  })
+
+  const restaurant = mapGooglePlace(parsed, '2026-07-16T12:00:00.000Z')
+  assert.equal(restaurant.provider, 'google_places')
+  assert.equal(restaurant.providerPlaceId, 'ChIJ-palate-test')
+  assert.equal(restaurant.city, 'Toronto')
+  assert.equal(restaurant.region, 'ON')
+  assert.equal(restaurant.countryCode, 'CA')
+  assert.equal(restaurant.priceLevel, 3)
+  assert.equal(restaurant.providerRating, 4.6)
+  assert.equal(restaurant.providerReviewCount, 321)
+  assert.equal(restaurant.openingHours?.openNow, true)
+  assert.equal(restaurant.photos[0]?.attribution, 'A Diner')
+})
+
+test('Google Places search responses reject malformed listings', () => {
+  assert.equal(googlePlacesResponseSchema.safeParse({ places: [{ id: 'missing-name' }] }).success, false)
 })

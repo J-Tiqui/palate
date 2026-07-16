@@ -17,6 +17,9 @@ export type PalateRestaurant = {
   distance: string
   friends: string[]
   source: 'database' | 'seeded' | 'google'
+  detailsHref?: string
+  ratingSource?: 'Palate' | 'Google' | 'Sample'
+  photoAttribution?: string | null
   latitude?: number
   longitude?: number
 }

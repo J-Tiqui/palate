@@ -13,7 +13,7 @@ export function PalateRestaurantCard({
   saved?: boolean
   returnTo?: string
 }) {
-  const detailsHref = `/restaurants/${restaurant.slug}`
+  const detailsHref = restaurant.detailsHref ?? `/restaurants/${restaurant.slug}`
   const recognition = restaurant.recognition?.split(' ·')[0]
 
   return (
@@ -34,13 +34,14 @@ export function PalateRestaurantCard({
       )}
       <Link className="card-hit" href={detailsHref}>
         <div className="card-image">
-          <Image src={restaurant.image} alt={`${restaurant.name} dining`} width={720} height={520} sizes="(max-width: 640px) 82vw, 320px" />
+          <Image src={restaurant.image} alt={`${restaurant.name} dining`} width={720} height={520} sizes="(max-width: 640px) 82vw, 320px" unoptimized={restaurant.source === 'google'} />
           {recognition ? <span className="recognition"><Sparkles aria-hidden="true" size={13} /> {recognition}</span> : null}
+          {restaurant.photoAttribution ? <small className="photo-attribution">Photo: {restaurant.photoAttribution}</small> : null}
         </div>
         <div className="card-body">
           <div className="card-title">
             <h3>{restaurant.name}</h3>
-            <span className="rating"><Star aria-hidden="true" size={13} fill="currentColor" /> {restaurant.rating.toFixed(1)}</span>
+            <span className="rating"><Star aria-hidden="true" size={13} fill="currentColor" /> {restaurant.rating > 0 ? restaurant.rating.toFixed(1) : 'New'}{restaurant.ratingSource ? <em>{restaurant.ratingSource}</em> : null}</span>
           </div>
           <p>{restaurant.cuisine} · {restaurant.neighbourhood} · {restaurant.price}</p>
           <div className="card-reason"><span>✦</span>{restaurant.reason}</div>

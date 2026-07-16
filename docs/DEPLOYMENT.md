@@ -11,9 +11,12 @@ Configure variables separately:
 | `NEXT_PUBLIC_SUPABASE_URL` | Non-production Supabase project | Production project |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Matching public key | Matching public key |
 | `NEXT_PUBLIC_SITE_URL` | Usually unset; app uses `VERCEL_URL` | `https://palateblend.com` |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Website-restricted preview key | Website-restricted production key |
 | OAuth enabled flags | Only configured providers | Only configured providers |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Preview widget/site key | Production widget/site key |
 | `GOOGLE_PLACES_API_KEY` | Test/restricted server key | Production/restricted server key |
+
+Enable Maps JavaScript API on the browser key and Places API (New) on the server key. Restrict the browser key by HTTP referrer and allow the exact local, preview, and production origins. Keep the Places key out of every `NEXT_PUBLIC_` variable. The server provider uses explicit field masks, validates Google responses, proxies photo bytes through signed Palate URLs, and does not cache expiring photo references.
 
 The current application does not need a service-role key. If a future administrative job needs it, add it only to the relevant server environment and isolate its import in a `server-only` module. Do not expose OAuth secrets in Vercel: Supabase owns those provider secrets.
 

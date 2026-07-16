@@ -113,10 +113,10 @@ export function MapView({ restaurants, savedIds, isDemo, mapApiKey, error }: Map
             <p><strong>{isSampleMap ? 'Sample map preview' : 'Palate catalogue'}</strong><small>{isSampleMap ? 'Not live provider data' : 'Community and provider records remain distinct'}</small></p>
             <em>{isSampleMap ? 'DEMO' : 'LIVE'}</em>
           </div>
-          {visible.map((restaurant) => (
+          {visible.map((restaurant, index) => (
             <button type="button" key={restaurant.id} className={selected?.id === restaurant.id ? 'active' : ''} onClick={() => selectRestaurant(restaurant.id)}>
-              <Image src={restaurant.image} alt="" width={140} height={130} />
-              <div><strong>{restaurant.name}</strong><span>{restaurant.cuisine}</span><small><Star aria-hidden="true" size={10} fill="currentColor" /> {restaurant.rating.toFixed(1)} · {restaurant.distance}</small></div>
+              <Image src={restaurant.image} alt="" width={140} height={130} loading={index === 0 ? 'eager' : 'lazy'} unoptimized={restaurant.source === 'google'} />
+              <div><strong>{restaurant.name}</strong><span>{restaurant.cuisine}</span><small><Star aria-hidden="true" size={10} fill="currentColor" /> {restaurant.rating > 0 ? restaurant.rating.toFixed(1) : 'New'} · {restaurant.distance}</small></div>
             </button>
           ))}
           {!visible.length ? <p className="map-empty">No places match these filters. Try a wider price range.</p> : null}
@@ -132,13 +132,13 @@ export function MapView({ restaurants, savedIds, isDemo, mapApiKey, error }: Map
 
           {selected ? (
             <article className="map-preview">
-              <Link className="map-preview-img" href={`/restaurants/${selected.slug}`}><Image src={selected.image} alt={selected.name} width={380} height={320} loading="eager" /></Link>
+              <Link className="map-preview-img" href={selected.detailsHref ?? `/restaurants/${selected.slug}`}><Image src={selected.image} alt={selected.name} width={380} height={320} loading="eager" unoptimized={selected.source === 'google'} /></Link>
               <div>
-                <span className="map-preview-top"><small>{selected.cuisine}</small><span className="rating"><Star size={12} fill="currentColor" /> {selected.rating.toFixed(1)}</span></span>
+                <span className="map-preview-top"><small>{selected.cuisine}</small><span className="rating"><Star size={12} fill="currentColor" /> {selected.rating > 0 ? selected.rating.toFixed(1) : 'New'}</span></span>
                 <h3>{selected.name}</h3>
                 <p>{selected.neighbourhood} · {selected.price} · {selected.distance}</p>
                 <div className="card-reason"><span>✦</span>{selected.reason}</div>
-                <Link href={`/restaurants/${selected.slug}`}>View details <ArrowRight aria-hidden="true" size={15} /></Link>
+                <Link href={selected.detailsHref ?? `/restaurants/${selected.slug}`}>View details <ArrowRight aria-hidden="true" size={15} /></Link>
               </div>
             </article>
           ) : (

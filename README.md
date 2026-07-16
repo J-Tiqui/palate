@@ -10,7 +10,7 @@ The canonical production URL is `https://palateblend.com`.
 - **Identity/data:** Supabase Auth and PostgreSQL through typed `@supabase/ssr` browser/server clients.
 - **Authorization:** PostgreSQL RLS is the final data boundary. Server actions also derive the current user server-side and accept no ownership IDs.
 - **Files:** Supabase Storage has a private avatar bucket and public restaurant-photo bucket with explicit policies.
-- **Providers:** Restaurant search is behind a server-only Google Places provider interface. Seed records are visibly marked as development samples.
+- **Providers:** Live text/nearby discovery, details, and signed photo delivery use a server-only Google Places (New) provider. Seed records are visibly marked as development samples, and Google ratings remain separate from Palate ratings.
 - **Hosting:** Vercel, with Cloudflare managing DNS for `palateblend.com`.
 
 ## Local development
@@ -38,17 +38,18 @@ Start from `.env.example`; keep all values untracked.
 | `NEXT_PUBLIC_SUPABASE_URL` | Browser + server | Yes | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser + server | Yes | Public Supabase key; legacy anon key is not used by this code |
 | `NEXT_PUBLIC_SITE_URL` | Browser + server | Production | Canonical URL; omit in Vercel previews to use `VERCEL_URL` |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Browser | Optional | Interactive map rendering; use a website-restricted Maps JavaScript API key |
 | `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | Browser | Optional | Show Google only after provider configuration |
 | `NEXT_PUBLIC_APPLE_AUTH_ENABLED` | Browser | Optional | Show Apple only after provider configuration |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Browser | Optional | Enable Turnstile on sign-up |
-| `GOOGLE_PLACES_API_KEY` | Server only | Optional | Places API (New) search; use a server-restricted key |
+| `GOOGLE_PLACES_API_KEY` | Server only | Optional | Places API (New) text/nearby search, details, and photos; use a separate API-restricted server key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | Not currently needed | Reserved for isolated administrative jobs; never import into client code |
 | `TURNSTILE_SECRET_KEY` | Server only | Supabase-managed in production | Included for future direct verification; configure Supabase CAPTCHA for current auth flow |
 | `SIGNUP_ACCESS_PASSWORD` | Server only | Temporary startup | Shared early-access password checked before Supabase creates a new account; never prefix with `NEXT_PUBLIC_` |
 
 During the initial private launch, set `SIGNUP_ACCESS_PASSWORD` to enable the early-access field. Production fails closed if the variable is missing, so new accounts cannot bypass the gate. Remove the variable and the temporary gate code together when sign-up opens publicly. OAuth buttons are hidden while the gate is active because provider sign-in can create a new Supabase user.
 
-Google Maps browser rendering is not currently implemented, so `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` should remain unset unless a browser map is introduced with its own restricted key.
+The browser Maps key and server Places key should be separate even if both belong to the same Google Cloud project. The browser key is visible to visitors and must use website restrictions; the Places key must remain server-only. Live discovery defaults to restaurants near central Toronto, while a query uses Google Text Search constrained to restaurants in the Toronto area. Google results are fetched on demand and are not silently persisted as Palate records.
 
 ## Commands
 

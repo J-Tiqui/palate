@@ -8,15 +8,21 @@ import { DEMO_NOTICE, demoActivity, demoRestaurants, images, type PalateRestaura
 
 export function DiscoverView({
   restaurants,
+  googleRestaurants,
   savedIds = new Set<string>(),
   isDemo,
   error,
+  googleError,
+  googleConfigured,
   viewer,
 }: {
   restaurants: PalateRestaurant[]
+  googleRestaurants: PalateRestaurant[]
   savedIds?: Set<string>
   isDemo: boolean
   error?: string | null
+  googleError?: string | null
+  googleConfigured: boolean
   viewer: ViewerProfile | null
 }) {
   const catalogue = restaurants.length >= 4 ? restaurants : demoRestaurants
@@ -34,6 +40,7 @@ export function DiscoverView({
         </p>
       ) : null}
       {error ? <p role="alert" className="mb-5 rounded-xl bg-[var(--wine)] px-4 py-3 text-sm text-white">{error}</p> : null}
+      {googleError ? <p role="status" className="mb-5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--muted)]">{googleError} Palate listings are still available.</p> : null}
 
       <section className="discover-intro">
         <div>
@@ -47,18 +54,18 @@ export function DiscoverView({
 
       {topPick ? (
         <section className="feature-grid">
-          <Link className="feature-card" href={`/restaurants/${topPick.slug}`}>
-            <Image src={topPick.image} alt="Italian dining spread" width={1200} height={900} loading="eager" />
+          <Link className="feature-card" href={topPick.detailsHref ?? `/restaurants/${topPick.slug}`}>
+            <Image src={topPick.image} alt={`${topPick.name} dining`} width={1200} height={900} loading="eager" unoptimized={topPick.source === 'google'} />
             <div className="image-shade" />
             <div className="feature-content">
               <div className="feature-top">
                 <span>TOP PICK FOR YOU</span>
-                <span className="rating"><Star aria-hidden="true" size={13} fill="currentColor" /> {topPick.rating.toFixed(1)}</span>
+                <span className="rating"><Star aria-hidden="true" size={13} fill="currentColor" /> {topPick.rating > 0 ? topPick.rating.toFixed(1) : 'New'} {topPick.ratingSource ?? ''}</span>
               </div>
               <div>
                 <h2>{topPick.name}</h2>
                 <p>{topPick.cuisine} · {topPick.neighbourhood} · {topPick.price}</p>
-                <div className="reason"><span>✦</span> Fits your date-night taste and Maya rated it 4.9</div>
+                <div className="reason"><span>✦</span> {topPick.reason}</div>
               </div>
             </div>
           </Link>
@@ -75,6 +82,17 @@ export function DiscoverView({
             <small>Last Blend: 94% match at Miku</small>
           </article>
         </section>
+      ) : null}
+
+      {googleRestaurants.length ? (
+        <RestaurantRail
+          title="Live restaurants from Google"
+          subtitle="Current Google Places listings · Google ratings are separate from Palate ratings"
+          restaurants={googleRestaurants.slice(0, 12)}
+          savedIds={savedIds}
+        />
+      ) : googleConfigured && !googleError ? (
+        <p className="provider-empty" role="status">Google Places returned no matching restaurants. Try another search.</p>
       ) : null}
 
       <RestaurantRail title="Recommended for you" subtitle="Built from your ratings, saves, and taste profile" restaurants={recommended} savedIds={savedIds} />

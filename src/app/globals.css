@@ -555,6 +555,64 @@ a {
   width: auto;
 }
 
+.photo-attribution {
+  position: absolute;
+  right: 0.55rem;
+  bottom: 0.45rem;
+  max-width: calc(100% - 1.1rem);
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: rgb(20 15 12 / 72%);
+  color: #fffaf1;
+  padding: 0.2rem 0.35rem;
+  font-size: 0.55rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.restaurant-card .rating em {
+  color: var(--muted);
+  font-size: 0.5rem;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.provider-empty {
+  margin-top: 2.5rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--surface);
+  color: var(--muted);
+  padding: 1rem;
+  font-size: 0.8rem;
+}
+
+.google-actions {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.provider-hours {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.8rem 0;
+}
+
+.provider-hours p,
+.provider-attribution p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+@media (width <= 620px) {
+  .google-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .empty-state {
   border: 1px dashed var(--line);
   text-align: center;
