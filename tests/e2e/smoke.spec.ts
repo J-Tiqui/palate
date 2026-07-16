@@ -5,11 +5,19 @@ const hasSupabase = Boolean(
     && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
 )
 
-test('homepage exposes the Palate discovery routes', async ({ page }) => {
+test('homepage welcomes visitors without impersonating a profile', async ({ page, isMobile }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: /What sounds good, Julian/i })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Discover', exact: true })).toHaveAttribute('href', '/discover')
-  await expect(page.getByRole('link', { name: 'Start a Blend', exact: true })).toHaveAttribute('href', '/blend')
+  await expect(page.getByRole('heading', { name: /Good restaurants.*Better reasons/i })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toHaveAttribute('href', '/login')
+  await expect(page.getByRole('link', { name: isMobile ? 'Build your taste profile' : 'Create profile', exact: true })).toHaveAttribute('href', '/signup')
+  await expect(page.getByRole('link', { name: /Explore the demo/i })).toHaveAttribute('href', '/discover')
+})
+
+test('anonymous discovery uses a neutral identity', async ({ page }) => {
+  await page.goto('/discover')
+  await expect(page.getByRole('heading', { name: /What sounds good, tonight/i })).toBeVisible()
+  await expect(page.getByRole('link', { name: /Build your taste profile/i })).toHaveAttribute('href', '/signup')
+  await expect(page.getByText('Julian', { exact: true })).toHaveCount(0)
 })
 
 test('login and signup forms expose accessible controls', async ({ page }) => {
@@ -20,7 +28,19 @@ test('login and signup forms expose accessible controls', async ({ page }) => {
 
   await page.goto('/signup')
   await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
+  await expect(page.getByLabel('Early access password')).toBeVisible()
   await expect(page.getByLabel('Confirm password')).toBeVisible()
+})
+
+test('new accounts require the temporary early access password', async ({ page }) => {
+  await page.goto('/signup')
+  await page.getByLabel('Early access password').fill('not-the-password')
+  await page.getByLabel('Email').fill(`early-access-${Date.now()}@example.test`)
+  await page.getByLabel('Password', { exact: true }).fill('TemporaryAccount123')
+  await page.getByLabel('Confirm password').fill('TemporaryAccount123')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Create account' }).click()
+  await expect(page.getByText('That early access password is incorrect.', { exact: true })).toBeVisible()
 })
 
 test('map renders sample places and working search and price filters', async ({ page, isMobile }) => {

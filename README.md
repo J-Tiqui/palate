@@ -44,6 +44,9 @@ Start from `.env.example`; keep all values untracked.
 | `GOOGLE_PLACES_API_KEY` | Server only | Optional | Places API (New) search; use a server-restricted key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | Not currently needed | Reserved for isolated administrative jobs; never import into client code |
 | `TURNSTILE_SECRET_KEY` | Server only | Supabase-managed in production | Included for future direct verification; configure Supabase CAPTCHA for current auth flow |
+| `SIGNUP_ACCESS_PASSWORD` | Server only | Temporary startup | Shared early-access password checked before Supabase creates a new account; never prefix with `NEXT_PUBLIC_` |
+
+During the initial private launch, set `SIGNUP_ACCESS_PASSWORD` to enable the early-access field. Production fails closed if the variable is missing, so new accounts cannot bypass the gate. Remove the variable and the temporary gate code together when sign-up opens publicly. OAuth buttons are hidden while the gate is active because provider sign-in can create a new Supabase user.
 
 Google Maps browser rendering is not currently implemented, so `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` should remain unset unless a browser map is introduced with its own restricted key.
 

@@ -11,6 +11,7 @@ const protectedPrefixes = [
   '/lists',
   '/onboarding',
   '/profile/edit',
+  '/recap',
   '/saved',
   '/settings',
 ]

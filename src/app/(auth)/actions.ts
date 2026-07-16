@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { publicFeatureFlags } from '@/lib/env/public'
 import { getSiteUrl } from '@/lib/env/site-url'
+import { isSignupAccessPasswordRequired, verifySignupAccessPassword } from '@/lib/auth/early-access'
 import { getPublicAuthError } from '@/lib/auth/errors'
 import { getSafeRedirectPath } from '@/lib/security/redirects'
 import { createClient } from '@/lib/supabase/server'
@@ -68,6 +69,7 @@ export async function signupAction(
   formData: FormData,
 ): Promise<AuthActionState> {
   const parsed = signupSchema.safeParse({
+    accessPassword: optionalFormString(formData, 'accessPassword'),
     email: formData.get('email'),
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),
@@ -77,6 +79,14 @@ export async function signupAction(
 
   if (!parsed.success) {
     return { status: 'error', message: firstValidationMessage(parsed.error) }
+  }
+
+  const accessResult = verifySignupAccessPassword(parsed.data.accessPassword)
+  if (accessResult === 'misconfigured') {
+    return { status: 'error', message: 'New account creation is temporarily paused. Please contact the Palate team.' }
+  }
+  if (accessResult === 'rejected') {
+    return { status: 'error', message: 'That early access password is incorrect.' }
   }
 
   const supabase = await createClient()
@@ -150,6 +160,8 @@ export async function resetPasswordAction(
 }
 
 export async function oauthAction(formData: FormData): Promise<void> {
+  if (isSignupAccessPasswordRequired()) redirect('/auth/error?reason=early-access-password')
+
   const provider = oauthProviderSchema.safeParse(formData.get('provider'))
   if (!provider.success) redirect('/auth/error?reason=provider')
 

@@ -1,16 +1,23 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Share2 } from 'lucide-react'
-import { Avatar, PalateShell } from '@/components/palate/app-shell'
+import { PalateShell } from '@/components/palate/app-shell'
+import { Avatar } from '@/components/palate/avatar'
+import { getFirstName } from '@/lib/auth/profile'
+import { getOptionalViewerProfile } from '@/lib/auth/server'
 import { images } from '@/lib/palate/demo-data'
 
-export default function RecapPage() {
+export default async function RecapPage() {
+  const viewer = await getOptionalViewerProfile()
+  const ownerName = viewer ? getFirstName(viewer.displayName) : 'Your'
+  const profileHref = viewer?.profileHref ?? '/login?next=%2Frecap'
+
   return (
-    <PalateShell>
+    <PalateShell viewer={viewer}>
       <div className="recap-page">
-        <Link className="back-link light" href="/profile/julian"><ArrowLeft />Profile</Link>
+        <Link className="back-link light" href={profileHref}><ArrowLeft />Profile</Link>
         <section className="recap-intro">
-          <span>PALATE · 2026 SO FAR</span><h1>A year measured<br />in <em>good tables.</em></h1><p>Julian’s food recap · January–July · prototype visit history</p>
+          <span>PALATE · 2026 SO FAR</span><h1>A year measured<br />in <em>good tables.</em></h1><p>{ownerName === 'Your' ? 'Your' : `${ownerName}’s`} food recap · January–July · prototype visit history</p>
           <button className="button cream"><Share2 />Share recap</button>
         </section>
         <section className="recap-grid">

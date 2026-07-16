@@ -3,6 +3,7 @@ import { AuthShell } from '@/components/auth/auth-shell'
 
 const messages: Record<string, string> = {
   'code-exchange': 'That sign-in link is invalid or has expired.',
+  'early-access-password': 'Provider sign-in is paused during early access. Sign in with your Palate email and account password.',
   'invalid-link': 'That email link is invalid or has expired.',
   'missing-code': 'The provider did not return a valid sign-in code.',
   'oauth-callback': 'The provider could not complete sign-in.',

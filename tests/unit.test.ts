@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { isSignupAccessPasswordRequired, verifySignupAccessPassword } from '../src/lib/auth/early-access.ts'
 import { getPublicAuthError } from '../src/lib/auth/errors.ts'
+import { getFirstName, getProfileHref, getProfileInitials } from '../src/lib/auth/profile.ts'
 import {
   rankBlendCandidates,
   scoreBlendCandidate,
@@ -70,6 +72,15 @@ test('signup validation rejects weak or mismatched passwords', () => {
     confirmPassword: 'different',
     terms: 'on',
   }).success, false)
+})
+
+test('temporary signup access password is enforced before account creation', () => {
+  const configured = { NODE_ENV: 'production', SIGNUP_ACCESS_PASSWORD: 'test-startup-code' }
+  assert.equal(isSignupAccessPasswordRequired(configured), true)
+  assert.equal(verifySignupAccessPassword('test-startup-code', configured), 'accepted')
+  assert.equal(verifySignupAccessPassword('wrong', configured), 'rejected')
+  assert.equal(verifySignupAccessPassword('', { NODE_ENV: 'production' }), 'misconfigured')
+  assert.equal(isSignupAccessPasswordRequired({ NODE_ENV: 'development' }), false)
 })
 
 test('login rejects malformed payloads before an auth request', () => {
@@ -148,6 +159,14 @@ test('safe redirects allow local paths and block open-redirect variants', () => 
 test('auth errors are mapped without exposing provider details', () => {
   assert.equal(getPublicAuthError({ code: 'invalid_credentials', message: 'sensitive backend detail' }), 'The email or password is incorrect.')
   assert.equal(getPublicAuthError({ code: 'unknown', message: 'database host db.internal failed' }), 'We could not complete that request. Please try again.')
+})
+
+test('profile identity helpers derive account-specific labels and routes', () => {
+  assert.equal(getProfileInitials('Maya Chen'), 'MC')
+  assert.equal(getProfileInitials('', 'ethan@example.com'), 'ET')
+  assert.equal(getProfileHref('maya_eats'), '/profile/maya_eats')
+  assert.equal(getProfileHref(null), '/onboarding')
+  assert.equal(getFirstName('  Priya Shah  '), 'Priya')
 })
 
 test('Blend rejects any candidate that violates one member allergy', () => {

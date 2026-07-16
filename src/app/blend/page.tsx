@@ -1,8 +1,8 @@
 import { PalateShell } from '@/components/palate/app-shell'
 import { BlendBuilder } from '@/components/palate/blend-builder'
-import { getOptionalUser } from '@/lib/auth/server'
+import { getOptionalViewerProfile } from '@/lib/auth/server'
 
 export default async function BlendPage() {
-  const user = await getOptionalUser()
-  return <PalateShell><BlendBuilder authenticated={Boolean(user)} /></PalateShell>
+  const viewer = await getOptionalViewerProfile()
+  return <PalateShell viewer={viewer}><BlendBuilder authenticated={Boolean(viewer)} viewer={viewer} /></PalateShell>
 }

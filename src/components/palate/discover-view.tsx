@@ -1,8 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Star } from 'lucide-react'
-import { Avatar } from '@/components/palate/app-shell'
+import { Avatar } from '@/components/palate/avatar'
 import { PalateRestaurantCard } from '@/components/palate/restaurant-card'
+import { getFirstName, type ViewerProfile } from '@/lib/auth/profile'
 import { DEMO_NOTICE, demoActivity, demoRestaurants, images, type PalateRestaurant } from '@/lib/palate/demo-data'
 
 export function DiscoverView({
@@ -10,16 +11,20 @@ export function DiscoverView({
   savedIds = new Set<string>(),
   isDemo,
   error,
+  viewer,
 }: {
   restaurants: PalateRestaurant[]
   savedIds?: Set<string>
   isDemo: boolean
   error?: string | null
+  viewer: ViewerProfile | null
 }) {
   const catalogue = restaurants.length >= 4 ? restaurants : demoRestaurants
   const topPick = catalogue.find((restaurant) => restaurant.slug === 'giulietta') ?? catalogue[0]
   const recommended = catalogue.slice(0, 4)
   const hiddenGems = [catalogue[3], catalogue[7], catalogue[6], catalogue[2]].filter(Boolean)
+  const greeting = viewer ? getFirstName(viewer.displayName) : 'tonight'
+  const profileHref = viewer?.profileHref ?? '/signup'
 
   return (
     <div className="page-wrap discover-page">
@@ -32,11 +37,11 @@ export function DiscoverView({
 
       <section className="discover-intro">
         <div>
-          <p className="eyebrow">Thursday, July 16 · Toronto</p>
-          <h1>What sounds good,<br /><em>Julian?</em></h1>
+          <p className="eyebrow">Toronto restaurant discovery</p>
+          <h1>What sounds good,<br /><em>{greeting}?</em></h1>
         </div>
-        <Link className="taste-chip" href="/profile/julian">
-          <span className="taste-dot" />Premium Casual Explorer <ArrowRight aria-hidden="true" size={16} />
+        <Link className="taste-chip" href={profileHref}>
+          <span className="taste-dot" />{viewer ? 'Your taste profile' : 'Build your taste profile'} <ArrowRight aria-hidden="true" size={16} />
         </Link>
       </section>
 
@@ -59,7 +64,7 @@ export function DiscoverView({
           </Link>
           <article className="quick-blend">
             <div className="blend-orb">
-              <Avatar initials="JT" tone="olive" />
+              <Avatar initials={viewer?.initials ?? 'YOU'} tone="olive" />
               <Avatar initials="MC" tone="wine" />
               <Avatar initials="EB" tone="amber" />
             </div>

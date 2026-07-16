@@ -19,10 +19,11 @@ const labels: Record<AuthFormMode, string> = {
   reset: 'Set new password',
 }
 
-export function AuthForm({ mode, action, next }: {
+export function AuthForm({ mode, action, next, requireAccessPassword = false }: {
   mode: AuthFormMode
   action: AuthFormAction
   next?: string
+  requireAccessPassword?: boolean
 }) {
   const [state, formAction] = useActionState(action, initialAuthState)
   const asksForEmail = mode !== 'reset'
@@ -31,6 +32,20 @@ export function AuthForm({ mode, action, next }: {
   return (
     <form action={formAction} className="space-y-4">
       {next && <input type="hidden" name="next" value={next} />}
+      {mode === 'signup' && requireAccessPassword && (
+        <label className="block text-sm font-medium">
+          Early access password
+          <input
+            required
+            name="accessPassword"
+            type="password"
+            autoComplete="off"
+            maxLength={128}
+            className="mt-2 w-full rounded-2xl border border-black/10 bg-[#fffdf9] px-4 py-3 outline-none ring-[#6b2637]/20 transition focus:ring-4"
+          />
+          <span className="mt-2 block text-xs font-normal leading-5 text-black/45">Temporary startup access for new Palate accounts.</span>
+        </label>
+      )}
       {asksForEmail && (
         <label className="block text-sm font-medium">
           Email

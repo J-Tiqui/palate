@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Bookmark, Heart, MoreHorizontal } from 'lucide-react'
-import { Avatar, PalateShell } from '@/components/palate/app-shell'
+import { PalateShell } from '@/components/palate/app-shell'
+import { Avatar } from '@/components/palate/avatar'
 import { demoActivity, demoFriends } from '@/lib/palate/demo-data'
 
 export default function ActivityPage() {

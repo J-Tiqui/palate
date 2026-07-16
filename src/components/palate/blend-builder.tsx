@@ -5,22 +5,25 @@ import Link from 'next/link'
 import { ArrowLeft, Bookmark, Check, Map, MapPin, Plus, Share2, Star, UserRound } from 'lucide-react'
 import { useActionState, useState } from 'react'
 import { createBlendAction, type ProductActionState } from '@/app/actions/product'
-import { Avatar } from '@/components/palate/app-shell'
+import { Avatar } from '@/components/palate/avatar'
+import { getFirstName, type ViewerProfile } from '@/lib/auth/profile'
 import { demoFriends, demoRestaurants } from '@/lib/palate/demo-data'
 
 const initialState: ProductActionState = { status: 'idle', message: '' }
 const resultRows = [
-  { restaurant: demoRestaurants[4], score: 94, reasons: ['Italian is a top-3 cuisine for all three', 'Warm, lively room fits tonight’s vibe', 'Maya rated it 4.9 and Ethan saved it'], concern: 'Peak dinner slots can book quickly', contributions: ['Julian · date night', 'Maya · pasta', 'Ethan · saved'] },
-  { restaurant: demoRestaurants[1], score: 91, reasons: ['Strong Japanese preference across the group', 'Works well for three and dietary needs', 'Within budget and a short streetcar ride'], concern: 'Slightly quieter than your selected vibe', contributions: ['Julian · Japanese', 'Maya · waterfront', 'Ethan · group fit'] },
-  { restaurant: demoRestaurants[2], score: 87, reasons: ['Everyone enjoys Thai flavours', 'Excellent value for the group', 'Lively atmosphere and flexible spice levels'], concern: 'Ethan likes it more strongly than the rest', contributions: ['Julian · spice', 'Maya · value', 'Ethan · 5.0 rating'] },
+  { restaurant: demoRestaurants[4], score: 94, reasons: ['Italian is a top-3 cuisine for all three', 'Warm, lively room fits tonight’s vibe', 'Maya rated it 4.9 and Ethan saved it'], concern: 'Peak dinner slots can book quickly', contributions: ['You · date night', 'Maya · pasta', 'Ethan · saved'] },
+  { restaurant: demoRestaurants[1], score: 91, reasons: ['Strong Japanese preference across the group', 'Works well for three and dietary needs', 'Within budget and a short streetcar ride'], concern: 'Slightly quieter than your selected vibe', contributions: ['You · Japanese', 'Maya · waterfront', 'Ethan · group fit'] },
+  { restaurant: demoRestaurants[2], score: 87, reasons: ['Everyone enjoys Thai flavours', 'Excellent value for the group', 'Lively atmosphere and flexible spice levels'], concern: 'Ethan likes it more strongly than the rest', contributions: ['You · spice', 'Maya · value', 'Ethan · 5.0 rating'] },
 ]
 
-export function BlendBuilder({ authenticated }: { authenticated: boolean }) {
+export function BlendBuilder({ authenticated, viewer }: { authenticated: boolean; viewer: ViewerProfile | null }) {
   const [state, formAction, pending] = useActionState(createBlendAction, initialState)
   const [stage, setStage] = useState<'setup' | 'results'>('setup')
   const [selectedFriends, setSelectedFriends] = useState(['Maya Chen', 'Ethan Brooks'])
   const [cuisines, setCuisines] = useState(['Surprise us'])
   const [vibes, setVibes] = useState(['Lively'])
+  const hostName = viewer ? getFirstName(viewer.displayName) : 'You'
+  const hostInitials = viewer?.initials ?? 'YOU'
 
   function toggleValue(value: string, values: string[], setValues: (values: string[]) => void) {
     setValues(values.includes(value) ? values.filter((item) => item !== value) : [...values, value])
@@ -49,7 +52,7 @@ export function BlendBuilder({ authenticated }: { authenticated: boolean }) {
         <section className="builder-main">
           <BuilderStep number="1" title="Who’s eating?" description="Select friends to blend with your taste profile." badge={`${selectedFriends.length + 1} people`}>
             <div className="participant-row">
-              <button type="button" className="participant selected"><Avatar initials="JT" tone="olive" /><strong>You</strong><small>Host</small><span><Check size={14} /></span></button>
+              <button type="button" className="participant selected"><Avatar initials={hostInitials} tone="olive" /><strong>{hostName}</strong><small>Host</small><span><Check size={14} /></span></button>
               {demoFriends.map((friend) => {
                 const selected = selectedFriends.includes(friend.name)
                 return <button type="button" key={friend.name} className={`participant ${selected ? 'selected' : ''}`} onClick={() => toggleValue(friend.name, selectedFriends, setSelectedFriends)}><Avatar initials={friend.initials} tone={friend.tone} /><strong>{friend.name.split(' ')[0]}</strong><small>{friend.compatibility}% fit</small>{selected ? <span><Check size={14} /></span> : null}</button>
@@ -84,7 +87,7 @@ export function BlendBuilder({ authenticated }: { authenticated: boolean }) {
 
         <aside className="blend-summary">
           <div className="summary-top"><span>YOUR BLEND</span><strong>Friday dinner</strong><small>Toronto · {selectedFriends.length + 1} people</small></div>
-          <div className="summary-people"><div className="avatar-stack"><Avatar initials="JT" tone="olive" /><Avatar initials="MC" tone="wine" /><Avatar initials="EB" tone="amber" /></div><p>Julian + Maya + Ethan</p></div>
+          <div className="summary-people"><div className="avatar-stack"><Avatar initials={hostInitials} tone="olive" /><Avatar initials="MC" tone="wine" /><Avatar initials="EB" tone="amber" /></div><p>{hostName} + Maya + Ethan</p></div>
           <dl><div><dt>Area</dt><dd>Queen &amp; Spadina</dd></div><div><dt>Distance</dt><dd>Within 5 km</dd></div><div><dt>Budget</dt><dd>Up to $$$</dd></div><div><dt>Cuisine</dt><dd>{cuisines.join(', ') || 'Any'}</dd></div><div><dt>Vibe</dt><dd>{vibes.join(', ') || 'Any'}</dd></div></dl>
           <div className="mini-score"><div><span style={{ width: '88%' }} /></div><p><strong>Strong overlap</strong><small>12 shared positive signals</small></p></div>
           {state.status === 'error' ? <p role="alert" className="text-sm text-[var(--wine)]">{state.message}</p> : null}

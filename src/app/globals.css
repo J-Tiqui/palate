@@ -307,6 +307,56 @@ a {
   display: grid;
 }
 
+.side-profile > form,
+.side-profile > form > button {
+  width: 30px;
+  height: 30px;
+}
+
+.side-profile > form > button {
+  color: var(--muted);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  place-items: center;
+  padding: 0;
+  display: grid;
+}
+
+.side-profile > form > button:hover {
+  color: var(--wine);
+}
+
+.more-sheet form {
+  margin: 0;
+}
+
+.more-sheet form .more-link {
+  color: inherit;
+}
+
+.profile-body-public {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.review-image-placeholder {
+  width: 100px;
+  height: 90px;
+  color: var(--wine);
+  background: var(--surface-2);
+  border-radius: 8px;
+  place-items: center;
+  display: grid;
+}
+
+.empty-profile-copy {
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  margin: 0;
+  padding: 24px 0;
+  font-size: 12px;
+}
+
 .section-heading > a,
 .section-heading > div + a {
   color: var(--muted);

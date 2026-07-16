@@ -46,6 +46,7 @@ export const loginSchema = z.object({
 })
 
 export const signupSchema = z.object({
+  accessPassword: z.string().max(128).optional().default(''),
   email: emailSchema,
   password: passwordSchema,
   confirmPassword: z.string(),

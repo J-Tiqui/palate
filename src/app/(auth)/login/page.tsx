@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { AuthForm } from '@/components/auth/auth-form'
 import { AuthShell } from '@/components/auth/auth-shell'
 import { OAuthButtons } from '@/components/auth/oauth-buttons'
+import { isSignupAccessPasswordRequired } from '@/lib/auth/early-access'
 import { getOptionalUser } from '@/lib/auth/server'
 import { getSafeRedirectPath } from '@/lib/security/redirects'
 import { loginAction } from '../actions'
@@ -15,6 +16,7 @@ export default async function LoginPage({
   const next = getSafeRedirectPath(params.next)
   const user = await getOptionalUser()
   if (user) redirect(next)
+  const accessPasswordRequired = isSignupAccessPasswordRequired()
 
   return (
     <AuthShell
@@ -28,7 +30,7 @@ export default async function LoginPage({
         </p>
       )}
       <AuthForm mode="login" action={loginAction} next={next} />
-      <OAuthButtons next={next} />
+      {accessPasswordRequired ? null : <OAuthButtons next={next} />}
     </AuthShell>
   )
 }

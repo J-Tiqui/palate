@@ -1,8 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, MoreHorizontal, Plus } from 'lucide-react'
-import { Avatar, PalateShell } from '@/components/palate/app-shell'
-import { getOptionalUser } from '@/lib/auth/server'
+import { PalateShell } from '@/components/palate/app-shell'
+import { Avatar } from '@/components/palate/avatar'
+import { getOptionalViewerProfile } from '@/lib/auth/server'
 import { hasSupabaseEnv } from '@/lib/env/public'
 import { DEMO_NOTICE, demoLists, images } from '@/lib/palate/demo-data'
 import { createClient } from '@/lib/supabase/server'
@@ -17,15 +18,15 @@ type ListCard = {
 }
 
 export default async function ListsPage() {
-  const user = hasSupabaseEnv() ? await getOptionalUser() : null
+  const viewer = hasSupabaseEnv() ? await getOptionalViewerProfile() : null
   let cards: ListCard[] = []
 
-  if (user) {
+  if (viewer) {
     const supabase = await createClient()
     const { data: lists } = await supabase
       .from('lists')
       .select('id, name, visibility, cover_url')
-      .eq('owner_id', user.id)
+      .eq('owner_id', viewer.id)
       .order('updated_at', { ascending: false })
     const ids = (lists ?? []).map((list) => list.id)
     const { data: items } = ids.length
@@ -47,12 +48,12 @@ export default async function ListsPage() {
     : cards
 
   return (
-    <PalateShell>
+    <PalateShell viewer={viewer}>
       <div className="page-wrap lists-page">
         {isDemo ? <p className="mb-5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-xs text-[var(--muted)]"><strong className="text-[var(--ink)]">Sample collections.</strong> {DEMO_NOTICE}</p> : null}
         <section className="page-title">
           <div><p className="eyebrow">Curated by you</p><h1>Lists &amp; collections</h1><p>Keep the places worth remembering — for tonight, someday, or a very specific mood.</p></div>
-          <Link className="button wine" href={user ? '/lists/new' : '/login?next=/lists'}><Plus />New list</Link>
+          <Link className="button wine" href={viewer ? '/lists/new' : '/login?next=/lists'}><Plus />New list</Link>
         </section>
         <div className="list-grid">
           {visibleCards.map((list) => (
@@ -62,7 +63,7 @@ export default async function ListsPage() {
               </Link>
               <div>
                 <span>{list.privacy}</span><h2>{list.title}</h2><p>{list.count} restaurants</p>
-                <footer><div className="avatar-stack"><Avatar initials="JT" tone="olive" small />{list.shared ? <Avatar initials="MC" tone="wine" small /> : null}</div><button aria-label={`More options for ${list.title}`}><MoreHorizontal /></button></footer>
+                <footer><div className="avatar-stack"><Avatar initials={viewer?.initials ?? 'YOU'} tone="olive" small />{list.shared ? <Avatar initials="MC" tone="wine" small /> : null}</div><button aria-label={`More options for ${list.title}`}><MoreHorizontal /></button></footer>
               </div>
             </article>
           ))}
