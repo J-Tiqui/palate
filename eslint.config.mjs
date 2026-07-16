@@ -12,6 +12,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "local-before-github-pull-20260715-170619/**",
   ]),
 ]);
 

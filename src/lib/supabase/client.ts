@@ -1,8 +1,8 @@
 import { createBrowserClient } from '@supabase/ssr'
+import { getSupabasePublicEnv } from '@/lib/env/public'
+import type { Database } from '@/types/database'
 
 export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-  )
+  const env = getSupabasePublicEnv()
+  return createBrowserClient<Database>(env.url, env.publishableKey)
 }

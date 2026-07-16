@@ -1,6 +1,260 @@
 @import "tailwindcss";
 
-:root { color-scheme: light; }
-* { box-sizing: border-box; }
-body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f4efe6; }
-a { text-decoration: none; color: inherit; }
+.theme-icon-sun {
+  display: none;
+}
+
+html[data-theme='dark'] .theme-icon-moon {
+  display: none;
+}
+
+html[data-theme='dark'] .theme-icon-sun {
+  display: block;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Next.js links replace the prototype's in-memory navigation buttons. */
+.side-nav nav a {
+  min-height: 46px;
+  color: var(--muted);
+  border-radius: 11px;
+  align-items: center;
+  gap: 13px;
+  padding: 0 15px;
+  font-size: 13px;
+  font-weight: 650;
+  transition: all 0.18s;
+  display: flex;
+}
+
+.side-nav nav a:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.side-nav nav a.active {
+  background: var(--surface);
+  color: var(--wine);
+  box-shadow: 0 1px 0 var(--line);
+}
+
+.side-nav nav a em {
+  background: color-mix(in srgb, var(--wine) 13%, transparent);
+  color: var(--wine);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 5px;
+  margin-left: auto;
+  padding: 3px 6px;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.side-profile > a {
+  background: transparent;
+  border: 0;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  display: grid;
+}
+
+.section-heading > a,
+.section-heading > div + a {
+  color: var(--muted);
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+}
+
+.map-preview > div > a {
+  color: var(--wine);
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  font-size: 8px;
+  font-weight: 750;
+  display: flex;
+}
+
+.goal-card footer a {
+  color: var(--wine);
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 750;
+  display: flex;
+}
+
+.profile-actions a,
+.personality-card a,
+.active-goal-mini a {
+  align-items: center;
+  gap: 5px;
+  display: inline-flex;
+}
+
+.personality-card a,
+.active-goal-mini a {
+  color: #e2b584;
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.profile-reviews article > a,
+.collection-list article > a {
+  border: 0;
+  border-radius: 8px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.collection-list article > a img {
+  object-fit: cover;
+  width: 90px;
+  height: 78px;
+}
+
+.action-row > a,
+.action-row > form > button {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  cursor: pointer;
+  border-radius: 9px;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+}
+
+.action-row > a:nth-child(2) {
+  background: var(--wine);
+  color: #fff;
+  border-color: var(--wine);
+}
+
+.match-card footer a {
+  color: var(--wine);
+  background: transparent;
+  border: 0;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  font-weight: 750;
+  display: flex;
+}
+
+.return-row label {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 7px;
+  padding: 7px 9px;
+  font-size: 9px;
+}
+
+.return-row label.selected {
+  border-color: var(--olive);
+  color: var(--olive);
+}
+
+.saved-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  display: grid;
+}
+
+.saved-grid .restaurant-card {
+  width: auto;
+}
+
+.empty-state {
+  border: 1px dashed var(--line);
+  text-align: center;
+  border-radius: 18px;
+  padding: 48px 24px;
+}
+
+.empty-state h2 {
+  font-family: var(--serif);
+  font-size: 28px;
+}
+
+.empty-state p {
+  color: var(--muted);
+  margin: 8px 0 20px;
+}
+
+.route-detail,
+.route-form {
+  z-index: 10;
+}
+
+.route-form {
+  align-items: center;
+  padding: 20px;
+}
+
+@media (width <= 850px) {
+  .mobile-nav a,
+  .mobile-nav button {
+    color: var(--muted);
+    background: transparent;
+    border: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+    font-size: 9px;
+    display: flex;
+    position: relative;
+  }
+
+  .mobile-nav a.active,
+  .mobile-nav button.active {
+    color: var(--wine);
+  }
+
+  .mobile-nav a em,
+  .mobile-nav button em {
+    font-style: normal;
+  }
+
+  .saved-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .route-detail,
+  .route-form {
+    padding: 0;
+  }
+}
