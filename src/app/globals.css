@@ -272,6 +272,12 @@ a {
   background: #e9e3d8;
 }
 
+/* Remove the decorative water block used by the retired prototype map. */
+.custom-map::after {
+  display: none;
+  content: none;
+}
+
 .google-map-canvas {
   min-height: 360px;
 }

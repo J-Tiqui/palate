@@ -48,6 +48,7 @@ test('map renders an interactive map with working search and price filters', asy
   await expect(page.getByTestId('google-map')).toBeVisible()
   await expect(page.locator('.google-map-shell')).toHaveAttribute('data-map-status', 'ready', { timeout: 15_000 })
   await expect(page.locator('.google-map-shell')).toHaveAttribute('data-marker-count', '8')
+  await expect.poll(() => page.locator('.custom-map').evaluate((element) => getComputedStyle(element, '::after').display)).toBe('none')
   await expect(page.getByRole('button', { name: 'Centre map on my location' })).toBeVisible()
   if (isMobile) {
     await expect(page.getByText('Map preview.')).toBeVisible()
