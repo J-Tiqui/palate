@@ -1,0 +1,4 @@
+.env*
+local-before-github-pull-20260715-170619/
+test-results/
+playwright-report/
